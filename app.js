@@ -10,6 +10,7 @@ let chatTurnstileWidgetId = null;
 let pendingCaptchaResolve = null;
 let pendingCaptchaReject = null;
 let turnstileRendered = false;
+let preloadedCaptchaToken = null;
 
 function resolveTurnstileSitekey() {
   if (window.APP_CONFIG && typeof window.APP_CONFIG.turnstileSitekey === 'string' && window.APP_CONFIG.turnstileSitekey.trim()) {
@@ -63,22 +64,6 @@ function getCaptchaMask() {
 function showTurnstileChallenge(container) {
   const mask = getCaptchaMask();
   mask.style.display = 'block';
-
-  container.style.position = 'fixed';
-  container.style.top = '50%';
-  container.style.left = '50%';
-  container.style.transform = 'translate(-50%, -50%)';
-  container.style.visibility = 'visible';
-  container.style.pointerEvents = 'auto';
-  container.style.zIndex = '10000';
-  container.style.display = 'flex';
-  container.style.justifyContent = 'center';
-  container.style.alignItems = 'center';
-  container.style.width = '330px';
-  container.style.height = '78px';
-  container.style.background = 'white';
-  container.style.borderRadius = '4px';
-  container.style.padding = '0';
   
   // Ensure light theme for Turnstile visibility
   if (document.documentElement.classList.contains('dark-theme')) {
@@ -94,13 +79,14 @@ function hideTurnstileChallenge(container) {
     mask.style.display = 'none';
   }
 
+  // Reset to default visible position
   container.style.position = 'fixed';
-  container.style.top = '-10000px';
-  container.style.left = '-10000px';
-  container.style.transform = 'none';
-  container.style.visibility = 'hidden';
-  container.style.pointerEvents = 'none';
-  container.style.display = 'none';
+  container.style.top = '50%';
+  container.style.left = '50%';
+  container.style.transform = 'translate(-50%, -50%)';
+  container.style.visibility = 'visible';
+  container.style.pointerEvents = 'auto';
+  container.style.display = 'flex';
 }
 
 function settleCaptcha(token, error) {
@@ -115,6 +101,7 @@ function settleCaptcha(token, error) {
 }
 
 function renderTurnstileWidget() {
+  console.debug('renderTurnstileWidget called, turnstile present:', !!window.turnstile);
   if (!window.turnstile) return false;
 
   const container = getTurnstileContainer();
@@ -127,7 +114,7 @@ function renderTurnstileWidget() {
       sitekey: resolveTurnstileSitekey(),
       size: 'normal',
       theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light',
-      execution: 'execute',
+      execution: 'render', // Render only, don't execute immediately
       callback(token) {
         hideTurnstileChallenge(container);
         settleCaptcha(token, null);
@@ -142,6 +129,7 @@ function renderTurnstileWidget() {
       },
     });
     turnstileRendered = true;
+    console.info('Turnstile rendered, widgetId=', chatTurnstileWidgetId);
     hideTurnstileChallenge(container);
     return true;
   } catch (error) {
@@ -154,6 +142,11 @@ function renderTurnstileWidget() {
 function initializeTurnstileOnFirstLoad() {
   if (window.turnstile) {
     renderTurnstileWidget();
+    // Show Turnstile widget on page load
+    const container = getTurnstileContainer();
+    if (container && turnstileRendered && chatTurnstileWidgetId !== null) {
+      showTurnstileChallenge(container);
+    }
   }
 }
 
@@ -169,9 +162,17 @@ async function waitForTurnstile(timeoutMs = 10000) {
 
 window.onloadTurnstileCallback = function onloadTurnstileCallback() {
   initializeTurnstileOnFirstLoad();
+  console.info('Turnstile loaded and widget initialized');
 };
 
 window.getChatCaptchaToken = function getChatCaptchaToken() {
+  // Return cached preloaded token if available (consumed once).
+  if (preloadedCaptchaToken) {
+    const token = preloadedCaptchaToken;
+    preloadedCaptchaToken = null;
+    return Promise.resolve(token);
+  }
+
   return new Promise((resolve, reject) => {
     if (pendingCaptchaReject) {
       pendingCaptchaReject(new Error('CAPTCHA request was replaced by a new one.'));
@@ -194,7 +195,7 @@ window.getChatCaptchaToken = function getChatCaptchaToken() {
         }
 
         showTurnstileChallenge(container);
-        window.turnstile.reset(chatTurnstileWidgetId);
+        // Execute the Turnstile widget to get a token
         window.turnstile.execute(chatTurnstileWidgetId);
       } catch (error) {
         const container = getTurnstileContainer();
@@ -578,6 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
   injectInlineChatStyles();
   getCaptchaMask();
   initializeTurnstileOnFirstLoad();
+
 
   window.initAISupportChat = function initAISupportChat(options = {}) {
     if (window.aiSupportChat && !options.forceReinit) {

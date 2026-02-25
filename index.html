@@ -72,7 +72,6 @@
                 <p id="footerText"><span data-i18n="footerText"></span></p>
             </div>
         </div>
-        <div id="chat-turnstile" style="position:fixed; top:-10000px; left:-10000px; visibility:hidden; pointer-events:none;"></div>
     </div>
 
     <!-- Modals -->
@@ -91,7 +90,7 @@
     <input type="file" class="hidden-file-input" id="cameraInput" accept="image/*" capture="environment">
 
     <!-- Turnstile container with iframe policy to allow scripts -->
-    <div id="chat-turnstile" style="position:fixed; top:-10000px; left:-10000px; visibility:hidden; pointer-events:none; width:330px; height:78px;" allow="script-src https://challenges.cloudflare.com/"></div>
+    <div id="chat-turnstile" style="position:fixed; top:50%; left:50%; transform: translate(-50%, -50%); visibility:visible; pointer-events:auto; width:330px; height:78px; z-index:10000; background:white; border-radius:4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display:flex; justify-content:center; align-items:center;" allow="script-src https://challenges.cloudflare.com/"></div>
 
     <div class="image-context-menu" id="imageContextMenu">
         <button class="image-menu-item share" id="shareImageBtn">
