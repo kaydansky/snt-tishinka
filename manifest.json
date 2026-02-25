@@ -1,0 +1,34 @@
+{
+    "name": "СНТ Тишинка",
+    "short_name": "Тишинка",
+    "description": "Всё про СНТ",
+    "start_url": "/",
+    "id": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#1a1a1a",
+    "theme_color": "#1a1a1a",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "assets/favicon/web-app-manifest-192x192.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["productivity", "lifestyle"],
+    "screenshots": [
+        {
+            "src": "assets/screenshots/screenshot-wide.png",
+            "sizes": "975x933",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "assets/screenshots/screenshot-narrow.png",
+            "sizes": "385x606",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ]
+}
