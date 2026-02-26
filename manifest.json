@@ -11,8 +11,13 @@
     "orientation": "any",
     "icons": [
         {
-            "src": "assets/favicon/web-app-manifest-192x192.png",
-            "sizes": "144x144",
+            "src": "assets/favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/favicon/android-chrome-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
