@@ -62,9 +62,20 @@ function getCaptchaMask() {
 }
 
 function showTurnstileChallenge(container) {
+  if (!container) return;
+
   const mask = getCaptchaMask();
   mask.style.display = 'block';
-  
+
+  container.style.position = 'fixed';
+  container.style.top = '50%';
+  container.style.left = '50%';
+  container.style.transform = 'translate(-50%, -50%)';
+  container.style.visibility = 'visible';
+  container.style.pointerEvents = 'auto';
+  container.style.display = 'flex';
+  container.style.opacity = '1';
+
   // Ensure light theme for Turnstile visibility
   if (document.documentElement.classList.contains('dark-theme')) {
     container.style.boxShadow = '0 2px 10px rgba(255,255,255,0.2)';
@@ -74,19 +85,18 @@ function showTurnstileChallenge(container) {
 }
 
 function hideTurnstileChallenge(container) {
+  if (!container) return;
+
   const mask = document.getElementById('captcha-mask');
   if (mask) {
     mask.style.display = 'none';
   }
 
-  // Reset to default visible position
-  container.style.position = 'fixed';
-  container.style.top = '50%';
-  container.style.left = '50%';
-  container.style.transform = 'translate(-50%, -50%)';
-  container.style.visibility = 'visible';
-  container.style.pointerEvents = 'auto';
-  container.style.display = 'flex';
+  // Fully hide widget UI until the next challenge execution.
+  container.style.pointerEvents = 'none';
+  container.style.visibility = 'hidden';
+  container.style.opacity = '0';
+  container.style.display = 'none';
 }
 
 function settleCaptcha(token, error) {
@@ -228,9 +238,11 @@ class AISupportChatWidget {
 
     const inputId = options.inputId || 'entryTextarea';
     const replyId = options.replyContainerId || 'reply';
+    const submitButtonId = options.submitButtonId || 'entrySubmitBtn';
 
     this.inputField = document.getElementById(inputId);
     this.messagesContainer = document.getElementById(replyId);
+    this.submitButton = document.getElementById(submitButtonId);
 
     if (!this.inputField) {
       throw new Error(`Input element #${inputId} not found.`);
@@ -241,7 +253,9 @@ class AISupportChatWidget {
 
     this.messagesContainer.classList.add('ai-chat-thread');
     this.addEventListeners();
-    this.addMessage('assistant', 'Здравствуйте! Я ИИ-помощник. Готов отвечать на Ваши вопросы.');
+    this.autoResizeInput();
+    this.updateSubmitButtonState();
+    // this.addMessage('assistant', 'Здравствуйте! Я ИИ-помощник. Готов отвечать на Ваши вопросы.');
   }
 
   addEventListeners() {
@@ -254,12 +268,37 @@ class AISupportChatWidget {
 
     this.inputField.addEventListener('input', () => {
       this.autoResizeInput();
+      this.updateSubmitButtonState();
     });
+
+    if (this.submitButton) {
+      this.submitButton.addEventListener('click', () => {
+        this.sendMessage();
+      });
+    }
   }
 
   autoResizeInput() {
+    const computedStyles = window.getComputedStyle(this.inputField);
+    const minHeight = parseFloat(computedStyles.minHeight) || 0;
+    const maxHeight = parseFloat(computedStyles.maxHeight);
+
     this.inputField.style.height = 'auto';
-    this.inputField.style.height = `${Math.min(this.inputField.scrollHeight, 220)}px`;
+    let nextHeight = Math.max(this.inputField.scrollHeight, minHeight);
+    if (Number.isFinite(maxHeight)) {
+      nextHeight = Math.min(nextHeight, maxHeight);
+      this.inputField.style.overflowY = this.inputField.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    } else {
+      this.inputField.style.overflowY = 'hidden';
+    }
+    this.inputField.style.height = `${nextHeight}px`;
+  }
+
+  updateSubmitButtonState() {
+    if (!this.submitButton) return;
+
+    const hasMessage = this.inputField.value.trim().length > 0;
+    this.submitButton.disabled = this.isProcessing || !hasMessage;
   }
 
   escapeHtml(text) {
@@ -311,9 +350,11 @@ class AISupportChatWidget {
     if (!message || this.isProcessing) return;
 
     this.isProcessing = true;
+    this.updateSubmitButtonState();
     this.addMessage('user', message);
     this.inputField.value = '';
     this.autoResizeInput();
+    this.updateSubmitButtonState();
     this.inputField.disabled = true;
 
     const typingIndicator = this.addTypingIndicator();
@@ -330,6 +371,7 @@ class AISupportChatWidget {
       this.isProcessing = false;
       this.inputField.disabled = false;
       this.inputField.focus();
+      this.updateSubmitButtonState();
     }
   }
 
@@ -429,8 +471,9 @@ class AISupportChatWidget {
   }
 
   async sendChatRequest(message) {
+    const shouldCloseCaptchaAfterPipeline = this.authMode === 'public' && !this.conversationId;
     let captchaToken = '';
-    if (this.authMode === 'public' && !this.conversationId) {
+    if (shouldCloseCaptchaAfterPipeline) {
       captchaToken = await this.ensurePublicSessionCaptcha();
     }
 
@@ -439,24 +482,31 @@ class AISupportChatWidget {
       conversationId: this.conversationId,
     };
 
-    if (this.authMode === 'public' && !this.conversationId) {
+    if (shouldCloseCaptchaAfterPipeline) {
       payload.captchaToken = captchaToken;
     }
 
-    const initResponse = await this.authFetch(`${this.apiBaseUrl}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const initResponse = await this.authFetch(`${this.apiBaseUrl}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    if (!initResponse.ok) {
-      const messageText = await this.extractErrorMessage(initResponse, `Failed to send message: ${initResponse.status}`);
-      throw new Error(messageText);
+      if (!initResponse.ok) {
+        const messageText = await this.extractErrorMessage(initResponse, `Failed to send message: ${initResponse.status}`);
+        throw new Error(messageText);
+      }
+
+      const initData = await initResponse.json();
+      this.conversationId = initData.conversationId;
+      return this.pollForResult(initData.requestId);
+    } finally {
+      if (shouldCloseCaptchaAfterPipeline) {
+        const container = getTurnstileContainer();
+        hideTurnstileChallenge(container);
+      }
     }
-
-    const initData = await initResponse.json();
-    this.conversationId = initData.conversationId;
-    return this.pollForResult(initData.requestId);
   }
 
   async pollForResult(requestId) {

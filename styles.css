@@ -103,7 +103,7 @@ body {
     line-height: 1.5;
     background: var(--bg-color);
     color: var(--text-color);
-    min-height: 100vh;
+    min-height: 100dvh;
     padding: 20px;
 }
 
@@ -293,6 +293,12 @@ body {
     overflow: hidden;
 }
 
+#mainContainer {
+    min-height: calc(100dvh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
 .header {
     background: var(--header-bg);
     color: var(--header-text);
@@ -367,6 +373,12 @@ body {
 
 .content {
     padding: 30px;
+}
+
+#mainContainer .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .calendar {
@@ -571,7 +583,11 @@ body {
 }
 
 .entries-section {
-    margin-top: 30px;
+    margin-top: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .entries-header {
@@ -1110,22 +1126,30 @@ label {
 }
 
 .entry-form {
-    margin-bottom: 20px;
+    margin: 0;
+    width: 100%;
     justify-content: flex-start;
     gap: 20px;
     flex-wrap: wrap;
 }
 
+.entry-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
 .entry-textarea {
     width: 100%;
-    padding: 15px;
+    padding: 15px 58px 15px 15px;
     border: 2px solid #6a6d77;
     border-radius: 20px;
     font-size: 1.3rem;
     font-family: inherit;
     line-height: 1.5;
-    resize: vertical;
+    resize: none;
     min-height: 120px;
+    max-height: 60vh;
+    overflow-y: hidden;
     outline: none;
     transition: all 0.3s;
     background: var(--entry-bg);
@@ -1134,6 +1158,35 @@ label {
 
 .entry-textarea:focus {
     box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+}
+
+.entry-submit-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 22px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--add-btn-bg);
+    color: #edecec;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.entry-submit-btn:hover:not(:disabled) {
+    background: var(--add-btn-hover);
+    transform: translateY(-1px);
+}
+
+.entry-submit-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .form-actions {
@@ -1372,6 +1425,10 @@ label {
         border-radius: 5px;
     }
 
+    #mainContainer {
+        min-height: 100dvh;
+    }
+
     .header {
         padding: 20px;
     }
@@ -1519,6 +1576,13 @@ label {
     .entry-textarea {
         font-size: 1rem;
         min-height: 100px;
+    }
+
+    .entry-submit-btn {
+        right: 14px;
+        bottom: 20px;
+        width: 34px;
+        height: 34px;
     }
 
     .form-actions {
