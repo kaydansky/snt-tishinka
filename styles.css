@@ -14,7 +14,7 @@
     --search-bg: #f8f9fa;
     --day-bg: #dde0e2;
     --day-hover: #d8dbdd;
-    --entry-bg: #ecedef;
+    --entry-bg: #f8f9fa;
     --user-entry-bg: #e0f7fa;
     --shadow: rgba(0, 0, 0, 0.1);
     --nav-btn-bg: #cad0e4;
@@ -45,8 +45,8 @@
     --search-bg: #3a3a3a;
     --day-bg: #494949;
     --day-hover: #4a4a4a;
-    --entry-bg: #4b4b4b;
-    --user-entry-bg: #2a2a2a;
+    --entry-bg: #3a3a3a;
+    --user-entry-bg: #4a4a4a;
     --shadow: rgba(0, 0, 0, 0.3);
     --nav-btn-bg: #4a5568;
     --nav-btn-hover: #5a6578;
@@ -353,7 +353,7 @@ body {
 }
 
 .reply .ai-chat-entry-user .ai-chat-entry-bubble {
-  background: var(--entry-bg);
+  background: var(--user-entry-bg);
   border-color: var(--border-color);
   border-radius: 12px 12px 0 12px;
   color: var(--text-color);
