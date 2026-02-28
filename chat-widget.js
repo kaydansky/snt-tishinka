@@ -87,7 +87,7 @@ class AISupportChatWidget {
     const urlRegex = /(https?:\/\/[^\s<]+)/g;
     return escaped.replace(urlRegex, (url) => {
       const cleanedUrl = url.replace(/[^\w\-._~:/?#[\]@!$&'()*+,;=%]$/, '');
-      return `<a href="${cleanedUrl}" target="_blank" rel="noopener noreferrer">${cleanedUrl}</a>`;
+      return `<a href="${cleanedUrl}" target="_blank" rel="noopener noreferrer">Скачать</a>`;
     });
   }
 
