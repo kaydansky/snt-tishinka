@@ -142,7 +142,7 @@ class AISupportChatWidget {
     } finally {
       this.isProcessing = false;
       this.inputField.disabled = false;
-      this.inputField.focus();
+      // this.inputField.focus();
       this.updateSubmitButtonState();
     }
   }
