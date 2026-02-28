@@ -81,18 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           await navigator.share({
             title: document.title,
-            text: 'Check out this app!',
+            text: 'Консультант по СНТ Тишинка',
             url: window.location.href
           });
         } catch (err) {
           // User cancelled the share dialog or there was an error
           if (err.name !== 'AbortError') {
-            console.log('Share failed:', err);
+            console.log('Не удалось поделиться:', err);
           }
         }
       } else {
         // Fallback for browsers that don't support Web Share API
-        alert('Web Share API is not supported in your browser. Please copy the URL manually.');
+        alert('Web Share API не поддерживается в вашем браузере. Пожалуйста, скопируйте URL вручную: ' + window.location.href);
       }
     });
   }
