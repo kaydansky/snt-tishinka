@@ -6,9 +6,11 @@
     "id": "/",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#1a1a1a",
-    "theme_color": "#1a1a1a",
+    "background_color": "#2d2d2d",
+    "theme_color": "#2d2d2d",
     "orientation": "any",
+    "lang": "ru",
+    "dir": "ltr",
     "icons": [
         {
             "src": "assets/favicon/android-chrome-192x192.png",
