@@ -3,7 +3,7 @@
  * Handles widget render/execute, mask show/hide, token promise API.
  */
 
-const DEFAULT_TURNSTILE_SITEKEY = '0x4AAAAAACb6BOyZu2RAFx_D';
+const DEFAULT_TURNSTILE_SITEKEY = 'YOUR_PUBLIC_KEY_HERE'; // Replace with your actual Turnstile site key or ensure it's set in APP_CONFIG
 
 let chatTurnstileWidgetId = null;
 let pendingCaptchaResolve = null;
