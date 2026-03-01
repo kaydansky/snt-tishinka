@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply initial theme
     document.documentElement.setAttribute('data-theme', initialTheme);
     updateThemeIcon(initialTheme);
+    updateThemeColor(initialTheme);
     
     // Toggle theme on button click
     toggleThemeBtn.addEventListener('click', () => {
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
       updateThemeIcon(newTheme);
+      updateThemeColor(newTheme);
     });
     
     // Update theme icon based on theme
@@ -63,6 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
         themeIcon.className = 'bi bi-sun-fill';
       } else {
         themeIcon.className = 'bi bi-moon-fill';
+      }
+    }
+
+    function updateThemeColor(theme) {
+      const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', theme === 'dark' ? '#2d2d2d' : '#ffffff');
       }
     }
   }

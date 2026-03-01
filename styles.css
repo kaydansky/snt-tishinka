@@ -110,6 +110,12 @@ body {
     padding: 20px;
 }
 
+@media (display-mode: standalone), (display-mode: fullscreen) {
+    body {
+        background: var(--container-bg);
+    }
+}
+
 /* Main App Styles */
 .container {
     max-width: 900px;

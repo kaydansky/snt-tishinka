@@ -1,7 +1,9 @@
-const CACHE_NAME = 'snt-tishinka-v1.0.3';
+const CACHE_NAME = 'snt-tishinka-v1.0.5';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/manifest.json',
+  '/assets/favicon/site.webmanifest',
   '/styles.css',
   '/app.js',
   '/chat-init.js',
