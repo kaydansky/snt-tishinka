@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snt-tishinka-v1.0.5';
+const CACHE_NAME = 'snt-tishinka-v1.0.6';
 const urlsToCache = [
   '/',
   '/index.html',
